@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <link rel="stylesheet" href="../wwwroot/lib/bootstrap/dist/css/bootstrap.min.css"></link>
+    <title>OHLC Chart</title>
+</head>
+
+<body>
+    <div class="card" style="width: 30%">
+        <p class="chart"></p>
+        <div class="card-body">
+            <h5 class="card-title">Card title</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+    </div>
+
+    <script src="ohlcChart.js"></script>
+    <script>
+        var chart = ohlcChart();
+        // parseDate = d3.timeParse("%Y-%m-%d");
+        parseDate = d3.timeParse("%m/%d/%Y");
+
+        d3.csv("MCD.csv")
+            .then(function(data) {
+                return data.map(function(d) {
+                    var date = parseDate(d["Date"]);
+                    d.date = date
+                    d.high = +d.High
+                    d.low = +d.Low
+                    d.open = +d.Open
+                    d.close = +d.Close
+                    return {
+                        date: d.date,
+                        high: d.high,
+                        low: d.low,
+                        open: d.open,
+                        close: d.close
+                    };
+                }).slice(-144)
+            })
+            .then(function(data) {
+                console.log(data)
+                d3.select("body")
+                    .datum(data)
+                    .call(chart)
+            })
+            .catch(function(error) {
+                throw error;
+            });
+    </script>
+</body>
+
+</html>

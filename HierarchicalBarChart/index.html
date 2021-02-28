@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="http://d3js.org/d3.v6.min.js"></script>
+    <title>Hierarchical Bar Chart</title>
+</head>
+
+<body>
+    <p id="example"></p>
+    <script src="HierBarChart.js"></script>
+    <script>
+        var chart = HierarchicalBarChart();
+
+        d3.json("flare-2.json")
+            .then(function(data) {
+                return data;
+            })
+            .then(function(data) {
+                console.log(data)
+                d3.select("body")
+                    .datum(data)
+                    .call(chart);
+            })
+            .catch(function(error) {
+                throw error;
+            });
+    </script>
+</body>
+
+</html>

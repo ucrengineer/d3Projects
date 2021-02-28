@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- older version 4 -->
+    <script src="http://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+
+
+    <title>Lets make a Bar chart</title>
+    <style>
+        .bar {
+            fill: steelblue;
+        }
+        
+        .bar:hover {
+            fill: brown;
+        }
+        
+        .axis--x path {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <svg width="960" height="500"></svg>
+    <script src="barchart.js"></script>
+    <script>
+        /* global barchart, d3 */
+        var myBarChart = barChart();
+        d3.csv("alphabet.csv")
+            .then(function(data) {
+                return data.map(function(d) {
+                    d.frequency = +d.frequency;
+                    return d;
+                });
+            })
+            .then(function(data) {
+                d3.select("svg")
+                    .datum(data)
+                    .call(myBarChart);
+            })
+            .catch(function(error) {
+                throw error;
+            });
+    </script>
+
+
+</body>
+
+</html>

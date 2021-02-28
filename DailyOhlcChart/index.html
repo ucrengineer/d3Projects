@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <link rel="stylesheet" href="../wwwroot/lib/bootstrap/dist/css/bootstrap.min.css"></link>
+    <title>OHLC Chart</title>
+</head>
+
+<body>
+    <div class="card mx-auto" style="width: 40%;">
+        <div class="card-body">
+            <h5 class="card-title text-center card-header">Card title</h5>
+            <p class="chart"></p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+    </div>
+    <style type="text/css">
+        .line .crosshair {
+            fill: none;
+            stroke-width: 1px;
+        }
+        
+        .line .trendline {
+            fill: none;
+            stroke-width: 1px;
+        }
+        
+        .line #crosshairX {
+            stroke: black;
+        }
+        
+        .line #crosshairY {
+            stroke: black;
+        }
+        
+        .line #trendline {
+            stroke: black;
+        }
+        
+        .overlay {
+            fill: none;
+            /* stroke: black; */
+            pointer-events: all;
+            stroke-width: 2px;
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+        }
+    </style>
+    <script src="DailyOhlcChart.js"></script>
+    <script>
+        var chart = ohlcChart();
+        // parseDate = d3.timeParse("%Y-%m-%d");
+        parseDate = d3.timeParse("%m/%d/%Y");
+
+        d3.csv("LL.csv")
+            .then(function(data) {
+                return data.map(function(d) {
+                    var date = parseDate(d["Date"]);
+                    d.date = date
+                    d.high = +d.High
+                    d.low = +d.Low
+                    d.open = +d.Open
+                    d.close = +d.Close
+                    d.volume = +d.Volume
+                    return {
+                        date: d.date,
+                        high: d.high,
+                        low: d.low,
+                        open: d.open,
+                        close: d.close,
+                        volume: d.volume
+                    };
+                }).slice(-253)
+            })
+            .then(function(data) {
+                console.log(data)
+                d3.select("body")
+                    .datum(data)
+                    .call(chart)
+            })
+            .catch(function(error) {
+                throw error;
+            });
+    </script>
+</body>
+
+</html>

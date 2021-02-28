@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+
+    <title>Sortable Bar Chart</title>
+</head>
+
+<body>
+    <div class="container" style="width:50%"></div>
+    <script src="SortableBarChart.js"></script>
+    <script>
+        var chart = SortableBarChart();
+
+        d3.csv("alphabet.csv")
+            .then(function(data) {
+                return data.map(function(d) {
+                    d.value = +d.frequency
+                    d.name = d.letter
+                    return d;
+                });
+            })
+            .then(function(data) {
+                console.log(data)
+                d3.select(".container")
+                    .datum(data)
+                    .call(chart);
+            })
+            .catch(function(error) {
+                throw error;
+            });
+    </script>
+
+</body>
+
+</html>

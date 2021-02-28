@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <style>
+        .card:hover {
+            box-shadow: 0 0 11px rgba(33, 33, 33, .2);
+        }
+        
+        .card-group {
+            margin-bottom: 1em;
+        }
+        
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            padding: .2rem;
+            background: #313639;
+            color: #f9f9f9;
+            border: 0px;
+            border-radius: 8px;
+            pointer-events: none;
+            font-size: .7rem;
+        }
+    </style>
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://d3js.org/d3.v6.min.js"></script>
+        <script src="analyticsDashboard.js"></script>
+        <link rel="stylesheet" href="../wwwroot/lib/bootstrap/dist/css/bootstrap.min.css"></link>
+        <title>Analytics Dashboard</title>
+    </head>
+
+    <body style="margin: 1em 1em 1em 1em;">
+        <div class="card-group">
+            <div class="card mx-auto flex-column">
+                <div class=" card-body ">
+                    <p class="chart-1 ">
+                        <!-- will create the svg in the d3.js code, code will select #chart-#.. -->
+                    </p>
+                </div>
+            </div>
+            <div class="card mx-auto " style="width: 40%; ">
+                <div class="card-body ">
+                    <p class="chart-2 ">
+                    </p>
+                </div>
+            </div>
+            <div class="card mx-auto " style="width: 40%; ">
+                <div class="card-body ">
+                    <p class="chart-3 ">
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card-group ">
+            <div class="card mx-auto " style="width: 40%; ">
+                <div class="card-body ">
+                    <p class="chart-4 ">
+                    </p>
+                </div>
+            </div>
+            <div class="card mx-auto " style="width: 40%; ">
+                <div class="card-body ">
+                    <p class="chart-5 ">
+                    </p>
+                </div>
+            </div>
+            <div class="card mx-auto " style="width: 40%; ">
+                <div class="card-body ">
+                    <p class="chart-6 ">
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="card-group ">
+            <div class="card mx-auto " style="width: 40%; ">
+                <div class="card-body ">
+                    <p class="chart-7 ">
+                    </p>
+                </div>
+            </div>
+            <div class="card mx-auto " style="width: 40%; ">
+                <div class="card-body ">
+                    <p class="chart-8 ">
+                        <svg height=250></svg>
+                    </p>
+                </div>
+            </div>
+            <div class="card mx-auto " style="width: 40%; ">
+                <div class="card-body ">
+                    <p class="chart-9 ">
+                        <svg height=250></svg>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            var dashboard = analyticsDashboard();
+            var parseDate = d3.timeParse("%Y-%m-%dT%H:%M:%S");
+            var morning = 0;
+            var midday = 0;
+            var marketClose = 0;
+            var morningpercent = [];
+            var middaypercent = [];
+            var closepercent = [];
+
+
+            d3.json("dataModelList.json ")
+                .then(function(data) {
+                    data = data.slice().sort((a, b) => d3.ascending(a.Form.ExitDate, b.Form.ExitDate))
+                    data = data.filter(d => d.Form.ExitDate != null);
+                    return data.map(function(d) {
+                        var entrydate = parseDate(d.Form["EntryDate"])
+                        var exitdate = parseDate(d.Form["ExitDate"])
+                        var positionType = d.Form.PositionType
+                        var pattern = d.Form.Pattern
+                        if (d.Form.PercentageChange != null) {
+                            var percentageChange = d.Form.PercentageChange
+                            var reactionPercentage = d.Form.ReactionPercentage
+                        } else {
+                            var percentageChange = null
+                            var reactionPercentage = null
+                        }
+                        d.entrydate = entrydate
+                        d.exitdate = exitdate
+                        d.positionType = positionType
+                        d.pattern = pattern
+                        d.percentageChange = percentageChange
+                        d.reactionPercentage = reactionPercentage
+                        if (entrydate.getHours() < 9) {
+                            morning++;
+                            morningpercent.push(d.percentageChange)
+                        } else if (entrydate.getHours() < 12) {
+                            midday++;
+                            middaypercent.push(d.percentageChange);
+                        } else if (entrydate.getHours() == 12) {
+                            marketClose++;
+                            closepercent.push(d.percentageChange)
+                        }
+
+                        d.morning = morning;
+                        d.midday = midday;
+                        d.close = marketClose;
+                        d.morningpercent = morningpercent;
+                        d.middaypercent = middaypercent;
+                        d.closepercent = closepercent;
+                        if (d.Form.NetOutcome != null) {
+                            d.netoutcome = d.Form.NetOutcome;
+                        } else {
+                            d.netoutcome = NaN
+                        }
+
+                        // d.form = form
+                        // d.stock = d.Stock
+                        return {
+                            entrydate: d.entrydate,
+                            exitdate: d.exitdate,
+                            positionType: d.positionType,
+                            pattern: d.pattern,
+                            percentageChange: d.percentageChange,
+                            reactionPercentage: d.reactionPercentage,
+                            morning: d.morning / data.length,
+                            midday: d.midday / data.length,
+                            close: d.close / data.length,
+                            morningpercent: d.morningpercent,
+                            middaypercent: d.middaypercent,
+                            closepercent: d.closepercent,
+                            netoutcome: d.netoutcome
+                                // form: d.form,
+                                // stock: d.stock,
+                        };
+                    })
+                })
+                .then(function(data) {
+                    console.log(data)
+                    d3.select("body ")
+                        .datum(data)
+                        .call(dashboard)
+                })
+                .catch(function(error) {
+                    throw error;
+                });
+        </script>
+
+
+
+
+
+
+
+
+
+
+
+    </body>
+
+</html>

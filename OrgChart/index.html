@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+
+    <title>Org Chart</title>
+</head>
+
+<body>
+    <script src="OrgChart.js"></script>
+    <script>
+        var chart = OrgChart();
+        d3.json("objects.json")
+            .then(function(data) {
+                return data;
+            })
+            .then(function(data) {
+                console.log(data);
+                d3.select("body")
+                    .datum(data)
+                    .call(chart)
+
+            })
+            .catch(function(error) {
+                throw error;
+            });
+    </script>
+</body>
+
+</html>
